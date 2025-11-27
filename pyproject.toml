@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Identification of latent EEG state trajectories based on deep learning methods."
 authors = [{name = "Ilya Rohin", email = "rohinia@my.msu.ru"}]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 
 dependencies = [
     "mne",
@@ -21,7 +21,7 @@ dependencies = [
 dev = [
     "ruff==0.3.0",
     "mypy==1.8.0",
-    "pre-commit==6.0.0",
+    "pre-commit==4.5.0",
     "ipdb",
 ]
 
@@ -71,7 +71,7 @@ target-version = "py39"
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`) codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
-select = ["E4", "E7", "E9", "F"]
+select = ["E4", "E7", "E9", "F", "I", "B"]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -111,7 +111,7 @@ docstring-code-line-length = "dynamic"
 # mypy global options:
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.13"
 ignore_missing_imports = true
 show_error_codes = true
 warn_return_any = true
@@ -124,17 +124,17 @@ exclude = [
 
 # mypy per-module options:
 
-[[tool.mypy.overrides]]
-module = "mycode.foo.*"
-disallow_untyped_defs = true
+# [[tool.mypy.overrides]]
+# module = "mycode.foo.*"
+# disallow_untyped_defs = true
 
-[[tool.mypy.overrides]]
-module = "mycode.bar"
-warn_return_any = false
+# [[tool.mypy.overrides]]
+# module = "mycode.bar"
+# warn_return_any = false
 
-[[tool.mypy.overrides]]
-module = [
-    "somelibrary",
-    "some_other_library"
-]
-ignore_missing_imports = true
+# [[tool.mypy.overrides]]
+# module = [
+#     "somelibrary",
+#     "some_other_library"
+# ]
+# ignore_missing_imports = true
