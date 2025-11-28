@@ -71,13 +71,13 @@ def get_dr_plots_dir(base_dir: Optional[str] = None) -> str:
 
 # --- BASE CONSTANTS ---
 
-CONDITIONS = ["pre", "post", "follow"]
-SUBJECT_DIR = ["sub-01"]  # [""] to process all
+CONDITIONS = ["pre", "post", "follow"]  # pre, MI-SES, MI-IES, post, follow
+SUBJECT_DIR = [""]  # [""] to process all, (sub-01, ..., sub-27)
 PRELOAD = True
 
 # DIRECTORIES
 
-DATA_ROOT = "/home/ilya/diplom/data/PEEG"
+DATA_ROOT = "/home/ilya/diplom/PEEG"
 
 # EPOCH CREATING
 
@@ -93,6 +93,14 @@ FMIN_PSD = 3
 FMAX_PSD = 35
 
 # UMAP PARAMETERS
+
+FREQ_BANDS = {
+    "ALL": (3, 35),
+    "THETA": (4, 7),
+    "ALPHA": (9, 13),
+    "BETA": (14, 35),
+}
+DR_FREQ_BAND = "ALL"  # "ALL", "THETA", "ALPHA", "BETA"
 
 UMAP_N_COMPONENTS = 100
 UMAP_N_NEIGHBORS = 20

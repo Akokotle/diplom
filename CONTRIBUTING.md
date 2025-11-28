@@ -1,68 +1,56 @@
-# Приветственное слово
+# Contributing Guidelines
 
-Добро пожаловать!
-Это github репозиторий, куда я постараюсь сохранять свои наработки по дипломной работе
+Welcome! This is a GitHub repository where I will be documenting and saving my work related to my diploma thesis.
 
-# Как пользоваться?
+## Quality Control Tools
 
-## 1. Настройка окружения
+* **Formatter and Linter**: [Ruff](https://docs.astral.sh/ruff/)
+* **Type Checker**: [Mypy](https://mypy-lang.org/)
+* **Hooks Manager**: [Pre-Commit](https://pre-commit.com/)
 
-Мы используем `pre-commit` для поддержания чистоты кода. Пожалуйста, настройте его перед созданием коммитов.
+## Environment Setup using uv
 
-1.  **Склонируйте репозиторий:**
+We use uv for dependency management and environment creation.
+
+1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/Akokotle/mlops.git](https://github.com/Akokotle/mlops.git)
-    cd mlops
+    git clone https://github.com/Akokotle/diplom.git
+    cd diplom
     ```
 
-2.  **Создайте и активируйте виртуальное окружение:**
+2.  **Create and activate the virtual environment with uv:**
     ```bash
-    python -m venv .venv
-    source .venv/bin/activate # (Linux/Mac)
-    # .venv\Scripts\activate # (Windows)
+    # Create .venv
+    uv venv --python 3.13
+    # Activate
+    source .venv/bin/activate
     ```
 
-3.  **Установите зависимости:**
-    Мы используем `pyproject.toml` для управления зависимостями.
+3.  **Install dependencies (core and dev) from pyproject.toml:**
     ```bash
-    pip install -e .[dev]
+    uv pip install -e ".[dev]"
     ```
 
-4.  **Установите pre-commit хуки:**
+4.  **Install pre-commit hooks:**
     ```bash
-    pre-commit install
+    pre-commit install --install-hooks
+    pre-commit install --install-hooks --hook-type pre-push
     ```
 
-## 2. Процесс работы (Workflow)
+## How to Use Linters
 
-1.  **Создайте ветку:** Всегда работайте в отдельной ветке, а не в `main`.
-    ```bash
-    git checkout -b feature/my-new-feature
-    ```
+### Automatic Checks (Pre-Commit Hooks)
 
-2.  **Пишите код и делайте коммиты:**
-    ```bash
-    git commit -m "FEAT: Добавил новую фичу"
-    ```
-    (При коммите автоматически сработают `pre-commit` хуки. Если они найдут ошибки, коммит будет прерван. Исправьте ошибки и попробуйте снова.)
+All checks (Ruff Formatter, Ruff Linter, Mypy Type Checker) run automatically every time you execute `git commit`.
 
-3.  **Запустите линтеры вручную (по желанию):**
-    Если вы хотите проверить весь проект, а не только измененные файлы:
-    ```bash
-    # Запустить все хуки на всех файлах
-    pre-commit run --all-files
-    ```
+* **Automatic Fixing**: Ruff will automatically fix most formatting and style errors. If files were modified by the hook, you must `git add` those fixed files and commit again.
+* **Commit Stoppage**: If Mypy detects typing errors or Ruff finds unfixable linting issues, the commit will be rejected.
 
-4.  **Создайте Merge Request (MR):**
-    Когда ваша работа готова, отправьте ветку на GitLab и создайте Merge Request в ветку `main`.
-    ```bash
-    git push -u origin feature/my-new-feature
-    ```
+### Manual Linter Usage
 
-## 3. Стиль кода
+You can run all checks manually to verify the entire project state, not just staged files:
 
-* **Форматирование:** Мы используем `ruff` с длиной строки **88 символов**.
-* **Линтинг:** Мы используем `ruff` для проверки стиля и ошибок.
-* **Типы:** Мы используем `mypy` для статической проверки типов.
-
-Конфигурации всех инструментов находятся в `pyproject.toml`.
+```bash
+# Run all pre-commit hooks on all files (includes automatic Ruff fixing)
+pre-commit run --all-files
+```

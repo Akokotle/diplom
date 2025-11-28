@@ -7,6 +7,8 @@ import pandas as pd
 import plotly.express as px
 from config import (
     CONDITIONS,
+    DR_FREQ_BAND,
+    FREQ_BANDS,
     PCA_N_COMPONENTS,
     UMAP_N_COMPONENTS,
     UMAP_N_NEIGHBORS,
@@ -53,12 +55,40 @@ def analyze_and_plot_dr_interactive(
             X = data["data_for_dr"]
             labels = data["labels"]
             run_labels = data["run_labels"]
+            freqs = data["freqs"]
 
             # Filter data by conditions from config
             mask = np.isin(labels, CONDITIONS)
             X_filtered = X[mask]
             labels_filtered = labels[mask]
             run_labels_filtered = run_labels[mask]
+
+            if DR_FREQ_BAND != "ALL":
+                f_min, f_max = FREQ_BANDS[DR_FREQ_BAND]
+
+                freq_indices = np.where((freqs >= f_min) & (freqs <= f_max))[0]
+
+                if freq_indices.size == 0:
+                    print(
+                        f"⚠️ There are no frequencies in the selected range '{DR_FREQ_BAND}' ({f_min}-{f_max} Hz). Skip."
+                    )
+                    continue
+
+                n_freqs_all = len(freqs)
+                # n_channels * n_freqs_all = X_filtered.shape[1]
+                n_channels = X_filtered.shape[1] // n_freqs_all
+
+                # (N_epochs, N_channels, N_freqs)
+                X_reshaped = X_filtered.reshape(
+                    X_filtered.shape[0], n_channels, n_freqs_all
+                )
+
+                X_band_selected = X_reshaped[:, :, freq_indices]
+                X_filtered = X_band_selected.reshape(X_band_selected.shape[0], -1)
+
+                print(
+                    f"✅ Data filtered by range: {DR_FREQ_BAND} ({f_min}-{f_max} Hz). New shape: {X_filtered.shape[1]}"
+                )
 
             if X_filtered.shape[0] < 2 * umap_n_neigh:
                 print("⚠️ Not enough epochs for UMAP. Skipping.")
@@ -93,6 +123,13 @@ def analyze_and_plot_dr_interactive(
             # 3. Interactive 3D visualization with Plotly
             print("Step 3/3: Interactive Plotly visualization...")
 
+            plot_title = (
+                f"[{subject_id}] PSD DR: UMAP -> PCA (Band: {DR_FREQ_BAND})<br>"
+                f"UMAP:<br>"
+                f"Number of neighbors = {UMAP_N_NEIGHBORS}<br>"
+                f"Number of components = {UMAP_N_COMPONENTS}"
+            )
+
             fig = px.scatter_3d(
                 df,
                 x="PC 1",
@@ -101,7 +138,7 @@ def analyze_and_plot_dr_interactive(
                 color="Condition",
                 symbol="Condition_Run",
                 hover_data=["Condition", "Run"],
-                title=f"[{subject_id}] PSD DR: UMAP -> PCA<br>UMAP:<br>Number of neighbors = {UMAP_N_NEIGHBORS}<br>Number of components = {UMAP_N_COMPONENTS}",
+                title=plot_title,
                 opacity=0.7,
                 height=700,
             )
@@ -114,10 +151,10 @@ def analyze_and_plot_dr_interactive(
             )
             fig.write_html(save_path)
 
-            print(f" ✅ Interactive 3D plot saved to {save_path}")
+            print(f"✅ Interactive 3D plot saved to {save_path}")
 
         except Exception as e:
-            print(f" ❌ Error during DR or plotting for {subject_id}: {e}")
+            print(f"❌ Error during DR or plotting for {subject_id}: {e}")
             continue
 
     print("\n==========================================")

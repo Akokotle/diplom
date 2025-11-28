@@ -1,25 +1,23 @@
-# Виртуальное окружение
+# venv
 .venv/
 venv/
 env/
 .env
 
-# Файлы кэша Python
+# cache files
 __pycache__/
 *.pyc
 *.pyo
+.*_cache/
 
-# Кэш IDE/Редакторов
+# IDE/Editor Cache
 .vscode/
 .idea/
 
-# Результаты сборки/пакеты
+# Build results/packages
 *.egg-info/
 build/
 dist/
 
-# Данные/Результаты анализа (если они создаются скриптами)
+# Data/Analysis results
 PSD_ANALYSIS_RESULTS/
-
-# Метаданные проекта (создаются при установке -e)
-*.egg-info/

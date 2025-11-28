@@ -15,12 +15,15 @@ dependencies = [
     "umap-learn",
     "matplotlib",
     "ipython",
+    "ipykernel",
+    "nbformat>=4.2.0",
+    "ipywidgets"
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff==0.3.0",
-    "mypy==1.8.0",
+    "ruff==0.14.0",
+    "mypy==1.17.0",
     "pre-commit==4.5.0",
     "ipdb",
 ]
