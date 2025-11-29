@@ -159,7 +159,7 @@ Welcome! This is a GitHub repository where I will be documenting and saving my w
 
     This script applies UMAP and PCA and generates an interactive 3D plot. It generates and saves the HTML file to the PSD_ANALYSIS_RESULTS/DR_PLOTS folder.
     ```bash
-    python scripts/2_plot_psd.py
+    python scripts/3_interactive_analyze_psd_dr.py
     ```
 
     3. Dimension Reduction (UMAP/PCA), comparison of hyperparameters in notebook
