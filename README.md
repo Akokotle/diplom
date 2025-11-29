@@ -162,7 +162,7 @@ Welcome! This is a GitHub repository where I will be documenting and saving my w
     python scripts/3_interactive_analyze_psd_dr.py
     ```
 
-    3. Dimension Reduction (UMAP/PCA), comparison of hyperparameters in notebook
+    4. Dimension Reduction (UMAP/PCA), comparison of hyperparameters in notebook
 
     There is also a notebook `dr_plotting.ipynb` where you can visualize and compare different hyperparameter values.
 
