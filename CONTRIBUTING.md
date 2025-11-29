@@ -1,16 +1,14 @@
 # Contributing Guidelines
 
-Welcome! This is a GitHub repository where I will be documenting and saving my work related to my diploma thesis.
-
 ## Quality Control Tools
+
+Automated tools are used to control code quality. All configuration details are managed via `.pre-commit-config.yaml` and `pyproject.toml`.
 
 * **Formatter and Linter**: [Ruff](https://docs.astral.sh/ruff/)
 * **Type Checker**: [Mypy](https://mypy-lang.org/)
 * **Hooks Manager**: [Pre-Commit](https://pre-commit.com/)
 
 ## Environment Setup using uv
-
-We use uv for dependency management and environment creation.
 
 1.  **Clone the repository:**
     ```bash
@@ -33,8 +31,39 @@ We use uv for dependency management and environment creation.
 
 4.  **Install pre-commit hooks:**
     ```bash
-    pre-commit install --install-hooks
-    pre-commit install --install-hooks --hook-type pre-push
+    # Installs hooks for pre-commit stage
+    pre-commit install
+    # Installs hooks for pre-push stage
+    pre-commit install --hook-type pre-push
+    ```
+
+
+
+## Submitting Changes
+
+1. **Sync main**
+    Ensure your local main branch is up-to-date.
+    ```bash
+    git checkout main
+    git pull origin main
+    ```
+
+2. **Create a new branch**
+    Use a descriptive name
+    ```bash
+    git checkout -b name_of_your_branch
+    ```
+
+3. **Committing**
+    ```bash
+    # Stage your changes
+    git add files_you_want_to_commit
+    git commit -m "Description of your commit."
+    ```
+
+4. Upload your branch to GitHub
+    ```bash
+    git push -u origin name_of_your_branch
     ```
 
 ## How to Use Linters
@@ -48,9 +77,9 @@ All checks (Ruff Formatter, Ruff Linter, Mypy Type Checker) run automatically ev
 
 ### Manual Linter Usage
 
-You can run all checks manually to verify the entire project state, not just staged files:
+You can run all checks manually to verify the entire project state:
 
-```bash
+```bush
 # Run all pre-commit hooks on all files (includes automatic Ruff fixing)
 pre-commit run --all-files
 ```
