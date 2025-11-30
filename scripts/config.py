@@ -77,7 +77,7 @@ PRELOAD = True
 
 # DIRECTORIES
 
-DATA_ROOT = "/home/ilya/diplom/PEEG"
+DATA_ROOT = "/your/path/to/PEEG"
 
 # EPOCH CREATING
 
