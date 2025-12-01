@@ -123,7 +123,6 @@ Welcome! This is a GitHub repository where I will be documenting and saving my w
 ## Usage
 
 0. **Downloading data**
-    Для скачивания данных используйте следующую команду
     ```bash
     # Download
     curl -L -A "Mozilla/5.0" -o eeg_data.rar https://springernature.figshare.com/ndownloader/files/49520919
