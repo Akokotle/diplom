@@ -4,20 +4,26 @@ version = "0.1.0"
 description = "Identification of latent EEG state trajectories based on deep learning methods."
 authors = [{name = "Ilya Rohin", email = "rohinia@my.msu.ru"}]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 
 dependencies = [
     "mne",
     "numpy",
     "pandas",
     "plotly",
+    "seaborn",
     "scikit-learn",
     "umap-learn",
     "matplotlib",
     "ipython",
     "ipykernel",
     "nbformat>=4.2.0",
-    "ipywidgets"
+    "ipywidgets",
+    "numba>=0.59.0",
+    "specparam",
+    "fooof",
+    "mne_icalabel",
+    "onnxruntime"
 ]
 
 [project.optional-dependencies]

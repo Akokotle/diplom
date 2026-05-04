@@ -1,35 +1,65 @@
-# PSD-Based Analysis and Dimensionality Reduction
+# Предобработка данных, вычисление и параметризация PSD, снижение размерности и визуализация
 
-This document details the first objective: EEG Data Loading, PSD Calculation, Dimensionality Reduction, and Visualization
+## Данные и предобработка
 
-## Data Source and Preprocessing
+1. **Набор данных**
 
-1. **Dataset**
-
-    First, I decided to analyze the EEG dataset focused on lower limb motor imagery (MI) from stroke patients [1].
+    Использовались данные ЭЭГ по воображению движения ног у пациентов с инсультом [1].
 
         [1] Liu, Y., Gui, Z., Yan, D. et al. Lower limb motor imagery EEG dataset based on the multi-paradigm and longitudinal-training of stroke patients. Sci Data 12, 314 (2025). https://doi.org/10.1038/s41597-025-04618-4
 
-2. **Preprocessing Pipeline**
+2. **Предобработка данных**
 
-    The data files were preprocessed. Preprocessing steps included:
+Использовались два набора данных:
 
-    1. **Artifact Channel Removal**: Exclusion of ECG and EOG channels (ECG, HEOR, HEOL, VEOU, VEOL).
-    2. **Referencing**: Setting the reference to the CPz channel.
-    3. **Bad Channel Handling**: Automatic removal of bad channels (amplitude deviation $> 50$ SD) followed by interpolation.
-    4. **Resampling**: Downsampling the data to 250 Hz.
-    5. **Filtering**: Application of a Band-Pass filter (3–35 Hz) and a Notch filter (49–51 Hz).
-    6. **Epochs creating**: Segmenting the data into epochs from -3 to 7 seconds relative to events 2 and 8.
-    7. **Channel Exclusion**: Further manual exclusion of 24 specific channels (FP1, FPZ, FP2, AF7, AF8, F7, F8, FT7, FT8, M1, T7, T8, M2, TP7, TP8, P7, P8, PO7, PO8, CB1, O1, OZ, O2, ECG, HEOR, HEOL, VEOU, VEOL).
-    8. **Manual Cleaning**: Manual removal of bad segments and channels (followed by interpolation).
-    9. **ICA Decomposition**: Independent Component Analysis (ICA) was performed.
-    10. **Artifact Component Classification**: Automatic classification and removal of artifactual components.
-    11. **Manual ICA Correction**: Manual inspection and removal of components.
+1) Данные, предварительно очищенные авторами (содержащие первые 9 с). Этапы предобработки следующие:
 
-## PSD Calculation and Initial Observations
+    1. Удаление 24 каналов (FP1, FPZ, FP2, AF7, AF8, F7, F8, FT7, FT8, M1, T7, T8, M2, TP7, TP8, P7, P8, PO7, PO8, CB1, O1, OZ, O2, ECG, HEOR, HEOL, VEOU, VEOL)
+    2. Установка референса относительно канала CPz.
+    3. Автоматическое удаление дефектных каналов (отклонение амплитуды $> 50$ стандартных отклонений) с последующей интерполяцией.
+    4. Понижение частоты дискретизации данных до 250 Гц.
+    5. Применение полосового фильтра (3–35 Гц) и Notch фильтра (49–51 Гц).
+    6. Сегментация данных на эпохи от -3 до 7 секунд относительно событий 2 и 8.
+    7. Ручное удаление дефектных сегментов и каналов (с последующей интерполяцией).
+    8. Разложение на независимые компоненты с помощью Extended Infomax ICA.
+    9. Автоматическая классификация с помощью ICLabel и удаление артефактных компонент (идентифицированных как моргания глаз или мышечная активность (с вероятностью >= 90%)).
+    10. Визуальный контроль и удаление компонентов вручную.
 
-The next step in the pipeline was the calculation of the PSD for each epoch and visualization. Significant and unexpected variability was observed in the PSD structure between subjects, and even across different experimental runs for the same subject. This high variance might indicate inconsistencies in the reported preprocessing steps across all files.
+2) Собственный набор, полученный путем самостоятельной предобработки исходных сырых данных. Данные предобрабатались примерно как описано выше, используя MNE-Python:
 
-## Dimension Reduction and Clustering
+    1. Удаление 24 каналов (FP1, FPZ, FP2, AF7, AF8, F7, F8, FT7, FT8, M1, T7, T8, M2, TP7, TP8, P7, P8, PO7, PO8, CB1, O1, OZ, O2, ECG, HEOR, HEOL, VEOU, VEOL)
+    2. Применение усредненного референса.
+    3. Автоматическое удаление каналов (отклонение амплитуды $> 50$ стандартных отклонений) с последующей интерполяцией.
+    4. Понижение частоты дискретизации данных до 250 Гц.
+    5. Применение полосового фильтра (3–35 Гц) и Notch фильтра (49–51 Гц).
+    6. Сегментация данных на эпохи от -3 до 6 и от 6 до 9 секунд относительно событий 2 и 8.
+    7. Фильтрация эпох по амплитуде (удаление эпох с размахом > 150 мкВ).
+    8. Разложение на независимые компоненты с помощью Extended Infomax ICA.
+    9. Автоматическая классификация с помощью ICLabel и удаление артефактных компонент (идентифицированных как моргания глаз или мышечная активность (с вероятностью >= 90%)).
 
-Dimension reduction methods — UMAP and PCA — were applied to the PSD data. After the data was visualized. The data generally showed good cluster separation, indicating that the PSD features successfully capture distinct states.
+Брались первые 9 секунд для обоих наборов данных. И последние 3 секунды отдыха для второго набора.
+
+## Параметризация PSD
+
+Для каждой эпохи вычислялась спектральная плотность мощности (PSD). Параметризация спектра выполнялась с использованием модели SpectralGroupModel. Параметры алгоритма были близки к значениям по умолчанию:
+
+Ограничение числа пиков (max_n_peaks = 6) применялось для предотвращения переобучения модели.
+
+Границы ширины пиков (peak_width_limits = [2, 12] Гц) были подобраны эмпирически на основе визуального анализа.
+
+Другие параметры: min_peak_height = 1, peak_threshold = 0.1, aperiodic_mode = 'fixed', periodic_mode = 'gaussian'.
+
+Для оценки качества подгонки модели для каждого субъекта и канала рассчитывались метрики ошибки (RMSE) и коэффициента детерминации ($R^2$), результаты которых визуализировались в виде тепловых карт.
+
+## Снижение размерности
+
+Для анализа этих многомерных данных применялись алгоритмы нелинейного снижения размерности. Сначала использовался алгоритм UMAP для снижения размерности пространства признаков до 15 компонент (n_components). Использовалась косинусная метрика (metric = 'cosine'), устойчивая к масштабированию признаков. Параметр min_dist был оставлен по умолчанию (0.1). Для выявления глобальной структуры данных (ожидаемого разделения на условия pre, post, follow) параметр количества соседей (n_neighbors) был установлен равным 50.
+
+На втором этапе применялся метод главных компонент (PCA) для проекции данных в 3D-пространство (n_components = 3).
+
+Четкого формирования отдельных кластеров, соответствующих разным условиям (pre, post, follow), не было выявлено визуально
+
+Для количественной оценки изменений вычислялись величины сдвига между центрами масс групп точек разных условий для каждого канала. На основе полученных сдвигов строились топографические карты сдвигов и тепловые карты. При рассмотрении тепловых карт субъект sub-23 был исключен из-за крайне большого сдвига.
+
+Судя по тепловым картам, общей тенденции, характерной для всей выборки субъектов, не обнаружено. Наблюдаемые различия в сдвигах являются субъект-специфичными.
+

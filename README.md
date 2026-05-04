@@ -33,10 +33,10 @@
 <br />
 
 <div>
-<h1 align="center">Diploma thesis</h1>
+<h1 align="center">Диплом</h1>
 
   <p align="center">
-    Identification of latent EEG state trajectories based on deep learning methods
+    Выявления латентных траекторий ЭЭГ состояний на основе методов глубинного обучения
     <br />
     <br />
     <a href="https://github.com/Akokotle/diplom/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
@@ -49,21 +49,21 @@
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary>Table of Contents</summary>
+  <summary>Оглавление</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
+      <a href="#о-проекте">О проекте</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#создано-с-использованием">Создано с использованием</a></li>
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+      <a href="#начало-работы">Начало работы</a>
       <ul>
-        <li><a href="#environment-setup-using-uv">Environment Setup</a></li>
+        <li><a href="#настройка-окружения">Настройка окружения</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#использование">Использование</a></li>
     <!-- <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -75,110 +75,96 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## О проекте
 
 <div align="center">
     <img src="images/logo.jpg" alt="Logo" width="600" height="600">
   </a>
 </div>
 
-Welcome! This is a GitHub repository where I will be documenting and saving my work related to my diploma thesis.
+Добро пожаловать! Это репозиторий GitHub, где я буду документировать и сохранять свою работу, связанную с моей дипломной работой.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
-### Built With
+### Создано с использованием
 
 * [MNE-Python](https://mne.tools/stable/index.html)
+* [specparam (FOOOF)](https://fooof-tools.github.io/fooof/)
+* [UMAP](https://umap-learn.readthedocs.io/en/latest/)
 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Начало работы
 
-### Environment Setup using uv
+### Настройка окружения
 
-1.  **Clone the repository:**
+1.  **Клонируйте репозиторий:**
     ```bash
-    git clone https://github.com/Akokotle/diplom.git
+    git clone [https://github.com/Akokotle/diplom.git](https://github.com/Akokotle/diplom.git)
     cd diplom
     ```
 
-2.  **Create and activate the virtual environment with uv:**
+2.  **Создайте и активируйте виртуальное окружение с помощью uv:**
     ```bash
-    # Create .venv
+    # Создание виртуального окружения
     uv venv --python 3.13
-    # Activate
+    # Активация виртуального окружения
     source .venv/bin/activate
     ```
 
-3.  **Install dependencies (core and dev) from pyproject.toml:**
+3.  **Установите зависимости из pyproject.toml:**
     ```bash
-    uv pip install -e ".[dev]"
+    uv pip install -r pyproject.toml --extra dev
     ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
 <!-- USAGE EXAMPLES -->
-## Usage
+## Использование
 
-0. **Downloading data**
+0. **Скачивание данных**
     ```bash
-    # Download
-    curl -L -A "Mozilla/5.0" -o eeg_data.rar https://springernature.figshare.com/ndownloader/files/49520919
-    # unzip
+    # Скачивание предобработанных данных
+    wget -O eeg_data.rar $(curl -s "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key=https://disk.360.yandex.ru/d/1obrzctSrN9U4g" | grep -o '"href":"[^"]*"' | cut -d'"' -f4)
+
+    # Скачивание сырых данных
+    wget -O eeg_sourcedata.rar $(curl -s "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key=https://disk.360.yandex.ru/d/W5W1CR4lHmcNlA" | grep -o '"href":"[^"]*"' | cut -d'"' -f4)
+
+    # Разархивирование
     unrar x eeg_data.rar
+    unrar x eeg_sourcedata.rar
     ```
 
+1.  **Настройка конфигурации:**
 
+    Перед запуском скриптов убедитесь, что пути и параметры правильно заданы в файле `config.py`:
+    *   `DATA_ROOT`: Должен указывать на корневую директорию с данными ЭЭГ (по умолчанию формируется автоматически как `results/PEEG`).
+    *   `SUBJECT_DIR`: Список ID испытуемых для обработки (по умолчанию [""] - обрабатываются все доступные, от `sub-01` до `sub-27`).
+    *   `CONDITIONS`: Экспериментальные условия (по умолчанию: ["pre", "post", "follow"]).
+    *   Также здесь задаются глобальные гиперпараметры для вычисления PSD, UMAP, PCA и SpectralGroupModel.
 
+2. **Пошаговый анализ**
 
-1.  **Configuration Setup:**
+  **1. Предобработка сырых данных**
+  Скрипт очищает исходные ЭЭГ-данных. Ход работы включает в себя: удаление каналов, переход на усредненный референс, автоматическую сплайн-интерполяцию удаленных каналов, полосовую и Notch фильтрацию. Сигнал нарезается на эпохи, после чего применяется алгоритм ICA и нейросеть ICLabel для автоматического удаления артефактов. Очищенные эпохи сохраняются в формате `.fif`.
+  ```bash
+  python scripts/preprocessing.py
+  ```
 
-    Before running the scripts, ensure your paths and parameters are correctly defined in config.py:
+  **2. Спектральная параметризация и выделение пиков**
+  Скрипт загружает данные и вычисляет спектральную плотность мощности (PSD). С помощью `specparam` спектр разделяется на периодическую и апериодическую компоненты, после чего извлекаются спектральные пики. Дополнительно вычисляются метрики качества подгонки модели (R-squared, RMSE) и генерируются их тепловые карты по каналам. Извлеченные параметры сохраняются в сжатые архивы NumPy `.npz` и метрики — в `.csv`.
+  ```bash
+  python scripts/1_extract_peaks.py
+  ```
 
-        DATA_ROOT: Must point to the root directory containing EEG data (for now it's PEEG directory).
+  **3. Снижение размерности (UMAP/PCA) и анализ спектральных сдвигов**
+  Скрипт загружает периодику и применяет алгоритмы снижения размерности (UMAP и PCA). Генерируются интерактивные 3D-графики (`.html`) проекций данных для каждого субъекта. Также вычисляются сдвиги между условиями, что визуализируется с помощью топографических карт и групповых тепловых карт.
+  ```bash
+  python scripts/2_visualize_manifold.py
+  ```
 
-        SUBJECT_DIR: Define the list of subject IDs you want to process (for now it's from sub-01 to sub-27).
-
-        CONDITIONS: Define the list of conditions you want to process (for now it's pre, MI-SES, MI-IES, post, follow)
-
-        EVENT_ID, T_MIN, T_MAX, BASELINE: Define the epoch parameters.
-
-        FMIN_PSD, FMAX_PSD, PSD_METHOD: Set the frequency range and method for PSD calculation.
-
-        DR_FREQ_BAND: Define type of the frequency band to use
-
-
-2. **Step-by-Step Analysis**
-
-    1. Calculate PSD
-
-    This script loads EEG data, creates epochs, and calculates the PSD for each epoch. The results are saved as compressed NumPy archives (.npz) for subsequent steps. [subject_id]_epoch_psd_data.npz files are saved in the PSD_ANALYSIS_RESULTS/PSD_DATA directory.
-    ```bash
-    python scripts/1_calculate_psd.py
-    ```
-
-    2. Plot PSD
-
-    This script averages the PSD across all channels for visualization, and generates a plot comparing different conditions and runs. It generates plots (.png) in the PSD_ANALYSIS_RESULTS/PSD_PLOTS directory.
-    ```bash
-    python scripts/2_plot_psd.py
-    ```
-
-    3. Dimension Reduction (UMAP/PCA)
-
-    This script applies UMAP and PCA and generates an interactive 3D plot. It generates and saves the HTML file to the PSD_ANALYSIS_RESULTS/DR_PLOTS folder.
-    ```bash
-    python scripts/3_interactive_analyze_psd_dr.py
-    ```
-
-    4. Dimension Reduction (UMAP/PCA), comparison of hyperparameters in notebook
-
-    There is also a notebook `dr_plotting.ipynb` where you can visualize and compare different hyperparameter values.
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
 
 
